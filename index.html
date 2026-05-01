@@ -15,103 +15,37 @@
       min-height: 100vh;
       padding: 32px 24px;
     }
-    header {
-      max-width: 1100px;
-      margin: 0 auto 32px;
-    }
-    header h1 {
-      font-size: 1.75rem;
-      font-weight: 700;
-      color: #f1f5f9;
-      margin-bottom: 6px;
-    }
-    header p {
-      font-size: 0.9rem;
-      color: #94a3b8;
-    }
-    header p a {
-      color: #38bdf8;
-      text-decoration: none;
-    }
-    #last-updated {
-      font-size: 0.8rem;
-      color: #64748b;
-      margin-top: 4px;
-    }
-    .legend {
-      display: flex;
-      gap: 20px;
-      flex-wrap: wrap;
-      margin-top: 12px;
-    }
-    .legend-item {
-      display: flex;
-      align-items: center;
-      gap: 7px;
-      font-size: 0.82rem;
-      color: #94a3b8;
-    }
-    .dot {
-      width: 12px; height: 12px;
-      border-radius: 50%;
-      flex-shrink: 0;
-    }
-    .summary-grid {
-      max-width: 1100px;
-      margin: 0 auto 32px;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-      gap: 14px;
-    }
-    .stat-card {
-      background: #1e293b;
-      border: 1px solid #334155;
-      border-radius: 10px;
-      padding: 16px 18px;
-    }
-    .stat-card .value {
-      font-size: 1.6rem;
-      font-weight: 700;
-      color: #f1f5f9;
-    }
-    .stat-card .label {
-      font-size: 0.78rem;
-      color: #64748b;
-      margin-top: 3px;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-    .chart-wrap {
-      max-width: 1100px;
-      margin: 0 auto 32px;
-      background: #1e293b;
-      border: 1px solid #334155;
-      border-radius: 12px;
-      padding: 24px;
-    }
-    .chart-wrap h2 {
-      font-size: 1rem;
-      font-weight: 600;
-      color: #cbd5e1;
-      margin-bottom: 16px;
-    }
-    #chart-main, #chart-groups { width: 100%; }
-    .loading {
-      text-align: center;
-      padding: 60px;
-      color: #475569;
-      font-size: 0.9rem;
-    }
-    footer {
-      max-width: 1100px;
-      margin: 40px auto 0;
-      font-size: 0.78rem;
-      color: #475569;
-      text-align: center;
-    }
+    nav { max-width: 1100px; margin: 0 auto 28px; display: flex; gap: 16px; align-items: center; }
+    nav a { font-size: 0.85rem; color: #94a3b8; padding: 6px 12px; border-radius: 6px;
+      border: 1px solid transparent; transition: all .15s; text-decoration: none; }
+    nav a:hover, nav a.active { border-color: #334155; color: #e2e8f0; }
+    nav .logo { font-weight: 700; color: #e2e8f0; font-size: 1rem; margin-right: auto; }
+    header { max-width: 1100px; margin: 0 auto 32px; }
+    header h1 { font-size: 1.75rem; font-weight: 700; color: #f1f5f9; margin-bottom: 6px; }
+    header p { font-size: 0.9rem; color: #94a3b8; }
+    header p a { color: #38bdf8; text-decoration: none; }
+    #last-updated { font-size: 0.8rem; color: #64748b; margin-top: 4px; }
+    .legend { display: flex; gap: 20px; flex-wrap: wrap; margin-top: 12px; }
+    .legend-item { display: flex; align-items: center; gap: 7px; font-size: 0.82rem; color: #94a3b8; }
+    .dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+    .summary-grid { max-width: 1100px; margin: 0 auto 32px;
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; }
+    .stat-card { background: #1e293b; border: 1px solid #334155; border-radius: 10px; padding: 16px 18px; }
+    .stat-card .value { font-size: 1.6rem; font-weight: 700; color: #f1f5f9; }
+    .stat-card .label { font-size: 0.78rem; color: #64748b; margin-top: 3px; text-transform: uppercase; letter-spacing: 0.05em; }
+    .chart-wrap { max-width: 1100px; margin: 0 auto 32px; background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 24px; }
+    .chart-wrap h2 { font-size: 1rem; font-weight: 600; color: #cbd5e1; margin-bottom: 16px; }
+    .loading { text-align: center; padding: 60px; color: #475569; font-size: 0.9rem; }
+    footer { max-width: 1100px; margin: 40px auto 0; font-size: 0.78rem; color: #475569; text-align: center; }
   </style>
 </head>
 <body>
+
+<nav>
+  <span class="logo">🌍 Ref Library</span>
+  <a href="index.html" class="active">Dashboard</a>
+  <a href="contribute.html">Contribute</a>
+</nav>
 
 <header>
   <h1>🌍 Master Reference Library — Data Load Dashboard</h1>
@@ -142,6 +76,7 @@
 <footer>
   Master Reference Library · andredavisme ·
   <a href="https://github.com/andredavisme/reference-library-dashboard" style="color:#38bdf8">GitHub</a>
+  · <a href="contribute.html" style="color:#38bdf8">Contribute</a>
 </footer>
 
 <script>
@@ -150,192 +85,101 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 const { createClient } = supabase;
 const db = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// Target definitions — update targets here as goals are set
-const DATASETS = [
-  { label: 'Hemispheres',             group: 'Geography – Core',    target: 4,     query: () => db.from('hemispheres').select('*', { count: 'exact', head: true }) },
-  { label: 'Continents',              group: 'Geography – Core',    target: 7,     query: () => db.from('continents').select('*', { count: 'exact', head: true }) },
-  { label: 'Water Bodies',            group: 'Geography – Core',    target: 23,    query: () => db.from('water_bodies').select('*', { count: 'exact', head: true }) },
-  { label: 'Countries',               group: 'Geography – Core',    target: 195,   query: () => db.from('countries').select('*', { count: 'exact', head: true }) },
-  { label: 'US States & Territories', group: 'North America – L1',  target: 56,    query: () => db.from('admin_level1').select('*', { count: 'exact', head: true }).eq('code', 'US-AL').gte('code', 'US-AA').or('country_id.eq.' + 'us_placeholder') },
-  { label: 'US States & Territories', group: 'North America – L1',  target: 56,    queryKey: 'us_l1' },
-  { label: 'Canada Provinces & Terr.',group: 'North America – L1',  target: 13,    queryKey: 'ca_l1' },
-  { label: 'Mexico States',           group: 'North America – L1',  target: 32,    queryKey: 'mx_l1' },
-  { label: 'All US Counties',         group: 'North America – L2',  target: 3143,  queryKey: 'us_l2' },
-  { label: 'All US Cities',           group: 'North America – L3',  target: 30000, queryKey: 'us_l3' },
-  { label: 'Canada Counties/Dist.',   group: 'North America – L2',  target: 293,   queryKey: 'ca_l2' },
-  { label: 'Mexico Municipalities',   group: 'North America – L3',  target: 2469,  queryKey: 'mx_l3' },
-  { label: 'Domains',                 group: 'Reference Library',   target: 10,    queryKey: 'domains' },
-  { label: 'Concepts',                group: 'Reference Library',   target: 500,   queryKey: 'concepts' },
-  { label: 'Glossary',                group: 'Reference Library',   target: 300,   queryKey: 'glossary' },
-  { label: 'Tags',                    group: 'Reference Library',   target: 100,   queryKey: 'tags' },
-  { label: 'Sources',                 group: 'Reference Library',   target: 50,    queryKey: 'sources' },
-];
+const LABELS  = ['Hemispheres','Continents','Water Bodies','Countries','US States & Terr.','Canada Provinces & Terr.','Mexico States','All US Counties','All US Cities','Canada Counties/Dist.','Mexico Municipalities','Domains','Concepts','Glossary','Tags','Sources'];
+const GROUPS  = ['Geography – Core','Geography – Core','Geography – Core','Geography – Core','North America – L1','North America – L1','North America – L1','North America – L2','North America – L3','North America – L2','North America – L3','Reference Library','Reference Library','Reference Library','Reference Library','Reference Library'];
+const TARGETS = [4,7,23,195,56,13,32,3143,30000,293,2469,10,500,300,100,50];
 
 async function fetchCounts() {
-  // Fetch country IDs
   const { data: countries } = await db.from('countries').select('id, iso2').in('iso2', ['US','CA','MX']);
   const usId = countries.find(c => c.iso2 === 'US')?.id;
   const caId = countries.find(c => c.iso2 === 'CA')?.id;
   const mxId = countries.find(c => c.iso2 === 'MX')?.id;
-
-  const queries = [
-    db.from('hemispheres').select('*', { count: 'exact', head: true }),
-    db.from('continents').select('*', { count: 'exact', head: true }),
-    db.from('water_bodies').select('*', { count: 'exact', head: true }),
-    db.from('countries').select('*', { count: 'exact', head: true }),
-    db.from('admin_level1').select('*', { count: 'exact', head: true }).eq('country_id', usId),
-    db.from('admin_level1').select('*', { count: 'exact', head: true }).eq('country_id', caId),
-    db.from('admin_level1').select('*', { count: 'exact', head: true }).eq('country_id', mxId),
-    db.from('admin_level2').select('*', { count: 'exact', head: true }).eq('country_id', usId),
-    db.from('admin_level3').select('*', { count: 'exact', head: true }).eq('country_id', usId),
-    db.from('admin_level2').select('*', { count: 'exact', head: true }).eq('country_id', caId),
-    db.from('admin_level3').select('*', { count: 'exact', head: true }).eq('country_id', mxId),
-    db.from('domains').select('*', { count: 'exact', head: true }),
-    db.from('concepts').select('*', { count: 'exact', head: true }),
-    db.from('glossary').select('*', { count: 'exact', head: true }),
-    db.from('tags').select('*', { count: 'exact', head: true }),
-    db.from('sources').select('*', { count: 'exact', head: true }),
-  ];
-
-  const results = await Promise.all(queries);
+  const results = await Promise.all([
+    db.from('hemispheres').select('*',{count:'exact',head:true}),
+    db.from('continents').select('*',{count:'exact',head:true}),
+    db.from('water_bodies').select('*',{count:'exact',head:true}),
+    db.from('countries').select('*',{count:'exact',head:true}),
+    db.from('admin_level1').select('*',{count:'exact',head:true}).eq('country_id',usId),
+    db.from('admin_level1').select('*',{count:'exact',head:true}).eq('country_id',caId),
+    db.from('admin_level1').select('*',{count:'exact',head:true}).eq('country_id',mxId),
+    db.from('admin_level2').select('*',{count:'exact',head:true}).eq('country_id',usId),
+    db.from('admin_level3').select('*',{count:'exact',head:true}).eq('country_id',usId),
+    db.from('admin_level2').select('*',{count:'exact',head:true}).eq('country_id',caId),
+    db.from('admin_level3').select('*',{count:'exact',head:true}).eq('country_id',mxId),
+    db.from('domains').select('*',{count:'exact',head:true}),
+    db.from('concepts').select('*',{count:'exact',head:true}),
+    db.from('glossary').select('*',{count:'exact',head:true}),
+    db.from('tags').select('*',{count:'exact',head:true}),
+    db.from('sources').select('*',{count:'exact',head:true}),
+  ]);
   return results.map(r => r.count ?? 0);
 }
 
-function statusColor(pct) {
-  if (pct >= 100) return '#22c55e';
-  if (pct >= 50)  return '#f59e0b';
-  if (pct > 0)    return '#3b82f6';
+function statusColor(p) {
+  if (p >= 100) return '#22c55e';
+  if (p >= 50)  return '#f59e0b';
+  if (p > 0)    return '#3b82f6';
   return '#475569';
 }
 
-const LABELS = [
-  'Hemispheres','Continents','Water Bodies','Countries',
-  'US States & Terr.','Canada Provinces & Terr.','Mexico States',
-  'All US Counties','All US Cities',
-  'Canada Counties/Dist.','Mexico Municipalities',
-  'Domains','Concepts','Glossary','Tags','Sources'
-];
-const GROUPS = [
-  'Geography – Core','Geography – Core','Geography – Core','Geography – Core',
-  'North America – L1','North America – L1','North America – L1',
-  'North America – L2','North America – L3',
-  'North America – L2','North America – L3',
-  'Reference Library','Reference Library','Reference Library','Reference Library','Reference Library'
-];
-const TARGETS = [4,7,23,195,56,13,32,3143,30000,293,2469,10,500,300,100,50];
-
 async function render() {
   const counts = await fetchCounts();
-  const now = new Date();
   document.getElementById('last-updated').textContent =
-    `Last updated: ${now.toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' })}`;
-
-  const pcts = counts.map((c, i) => Math.min((c / TARGETS[i]) * 100, 100));
+    `Last updated: ${new Date().toLocaleString('en-US',{dateStyle:'medium',timeStyle:'short'})}`;
+  const pcts = counts.map((c,i) => Math.min((c/TARGETS[i])*100,100));
   const colors = pcts.map(statusColor);
-
-  // Summary cards
-  const totalLoaded = counts.reduce((a, b) => a + b, 0);
-  const totalTarget = TARGETS.reduce((a, b) => a + b, 0);
-  const complete = pcts.filter(p => p >= 100).length;
-  const inProgress = pcts.filter(p => p > 0 && p < 100).length;
-  const planned = pcts.filter(p => p === 0).length;
-  const overallPct = Math.round((totalLoaded / totalTarget) * 100);
-
-  const grid = document.getElementById('summary-grid');
-  grid.innerHTML = [
+  const totalLoaded = counts.reduce((a,b)=>a+b,0);
+  const totalTarget = TARGETS.reduce((a,b)=>a+b,0);
+  const complete = pcts.filter(p=>p>=100).length;
+  const inProg   = pcts.filter(p=>p>0&&p<100).length;
+  const planned  = pcts.filter(p=>p===0).length;
+  const overall  = Math.round((totalLoaded/totalTarget)*100);
+  document.getElementById('summary-grid').innerHTML = [
     ['Total Records', totalLoaded.toLocaleString()],
     ['Target Records', totalTarget.toLocaleString()],
-    ['Overall Complete', overallPct + '%'],
-    ['Datasets Complete', complete + ' / ' + LABELS.length],
-    ['In Progress', inProgress],
+    ['Overall Complete', overall+'%'],
+    ['Datasets Complete', complete+' / '+LABELS.length],
+    ['In Progress', inProg],
     ['Planned', planned],
-  ].map(([label, value]) => `
-    <div class="stat-card">
-      <div class="value">${value}</div>
-      <div class="label">${label}</div>
-    </div>
-  `).join('');
+  ].map(([l,v])=>`<div class="stat-card"><div class="value">${v}</div><div class="label">${l}</div></div>`).join('');
 
-  // Main bar chart
-  const remaining = counts.map((c, i) => Math.max(TARGETS[i] - c, 0));
+  Plotly.newPlot('chart-main',[
+    {type:'bar',orientation:'h',name:'Target',y:LABELS,x:TARGETS,marker:{color:'rgba(148,163,184,0.15)'},hovertemplate:'%{y}<br>Target: %{x:,}<extra></extra>'},
+    {type:'bar',orientation:'h',name:'Loaded',y:LABELS,x:counts,marker:{color:colors},customdata:counts.map((c,i)=>[c,TARGETS[i],pcts[i].toFixed(1)]),
+     text:pcts.map((p,i)=>p>=100?`✓ ${counts[i].toLocaleString()}`:p>0?`${p.toFixed(0)}%`:''),
+     textposition:'inside',insidetextanchor:'start',textfont:{color:'#fff',size:11},
+     hovertemplate:'%{y}<br>Loaded: %{customdata[0]:,} / %{customdata[1]:,}<br>%{customdata[2]}% complete<extra></extra>'}
+  ],{barmode:'overlay',paper_bgcolor:'transparent',plot_bgcolor:'transparent',
+     font:{color:'#94a3b8',family:'-apple-system,sans-serif'},
+     margin:{l:200,r:60,t:20,b:50},
+     xaxis:{type:'log',title:'Record Count (log scale)',color:'#64748b',gridcolor:'#1e293b'},
+     yaxis:{autorange:'reversed',color:'#94a3b8',tickfont:{size:12},ticksuffix:'  '},
+     legend:{orientation:'h',x:0.5,xanchor:'center',y:-0.12,font:{size:11}},
+     bargap:0.3,height:560},{responsive:true});
 
-  Plotly.newPlot('chart-main', [
-    {
-      type: 'bar', orientation: 'h',
-      name: 'Target',
-      y: LABELS, x: TARGETS,
-      marker: { color: 'rgba(148,163,184,0.15)' },
-      hovertemplate: '%{y}<br>Target: %{x:,}<extra></extra>',
-    },
-    {
-      type: 'bar', orientation: 'h',
-      name: 'Loaded',
-      y: LABELS, x: counts,
-      marker: { color: colors },
-      customdata: counts.map((c,i) => [c, TARGETS[i], pcts[i].toFixed(1)]),
-      text: pcts.map((p,i) => p >= 100 ? `✓ ${counts[i].toLocaleString()}` : p > 0 ? `${p.toFixed(0)}%` : ''),
-      textposition: 'inside',
-      insidetextanchor: 'start',
-      textfont: { color: '#fff', size: 11 },
-      hovertemplate: '%{y}<br>Loaded: %{customdata[0]:,} / %{customdata[1]:,}<br>%{customdata[2]}% complete<extra></extra>',
-    }
-  ], {
-    barmode: 'overlay',
-    paper_bgcolor: 'transparent',
-    plot_bgcolor: 'transparent',
-    font: { color: '#94a3b8', family: '-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif' },
-    margin: { l: 200, r: 60, t: 20, b: 50 },
-    xaxis: { type: 'log', title: 'Record Count (log scale)', color: '#64748b', gridcolor: '#1e293b' },
-    yaxis: { autorange: 'reversed', color: '#94a3b8', tickfont: { size: 12 }, ticksuffix: '  ' },
-    legend: { orientation: 'h', x: 0.5, xanchor: 'center', y: -0.12, font: { size: 11 } },
-    bargap: 0.3,
-    height: 560,
-  }, { responsive: true });
-
-  // Group rollup chart
   const groupNames = [...new Set(GROUPS)];
-  const groupData = groupNames.map(g => {
-    const idxs = GROUPS.map((gr, i) => gr === g ? i : -1).filter(i => i >= 0);
-    const gLoaded = idxs.reduce((s, i) => s + counts[i], 0);
-    const gTarget = idxs.reduce((s, i) => s + TARGETS[i], 0);
-    const gPct = Math.min((gLoaded / gTarget) * 100, 100);
-    return { name: g, loaded: gLoaded, target: gTarget, pct: gPct };
+  const groupData = groupNames.map(g=>{
+    const idxs = GROUPS.map((gr,i)=>gr===g?i:-1).filter(i=>i>=0);
+    const gL = idxs.reduce((s,i)=>s+counts[i],0);
+    const gT = idxs.reduce((s,i)=>s+TARGETS[i],0);
+    const gP = Math.min((gL/gT)*100,100);
+    return {name:g,loaded:gL,target:gT,pct:gP};
   });
-
-  Plotly.newPlot('chart-groups', [
-    {
-      type: 'bar', orientation: 'h',
-      name: 'Target',
-      y: groupData.map(g => g.name),
-      x: groupData.map(g => g.target),
-      marker: { color: 'rgba(148,163,184,0.15)' },
-    },
-    {
-      type: 'bar', orientation: 'h',
-      name: 'Loaded',
-      y: groupData.map(g => g.name),
-      x: groupData.map(g => g.loaded),
-      marker: { color: groupData.map(g => statusColor(g.pct)) },
-      text: groupData.map(g => `${g.pct.toFixed(0)}%  (${g.loaded.toLocaleString()} / ${g.target.toLocaleString()})`),
-      textposition: 'inside',
-      insidetextanchor: 'start',
-      textfont: { color: '#fff', size: 12 },
-      hovertemplate: '%{y}<br>%{text}<extra></extra>',
-    }
-  ], {
-    barmode: 'overlay',
-    paper_bgcolor: 'transparent',
-    plot_bgcolor: 'transparent',
-    font: { color: '#94a3b8', family: '-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif' },
-    margin: { l: 200, r: 60, t: 20, b: 50 },
-    xaxis: { type: 'log', title: 'Record Count (log scale)', color: '#64748b', gridcolor: '#1e293b' },
-    yaxis: { autorange: 'reversed', color: '#94a3b8', tickfont: { size: 13 }, ticksuffix: '  ' },
-    legend: { orientation: 'h', x: 0.5, xanchor: 'center', y: -0.18, font: { size: 11 } },
-    bargap: 0.35,
-    height: 320,
-  }, { responsive: true });
+  Plotly.newPlot('chart-groups',[
+    {type:'bar',orientation:'h',name:'Target',y:groupData.map(g=>g.name),x:groupData.map(g=>g.target),marker:{color:'rgba(148,163,184,0.15)'}},
+    {type:'bar',orientation:'h',name:'Loaded',y:groupData.map(g=>g.name),x:groupData.map(g=>g.loaded),
+     marker:{color:groupData.map(g=>statusColor(g.pct))},
+     text:groupData.map(g=>`${g.pct.toFixed(0)}%  (${g.loaded.toLocaleString()} / ${g.target.toLocaleString()})`),
+     textposition:'inside',insidetextanchor:'start',textfont:{color:'#fff',size:12},
+     hovertemplate:'%{y}<br>%{text}<extra></extra>'}
+  ],{barmode:'overlay',paper_bgcolor:'transparent',plot_bgcolor:'transparent',
+     font:{color:'#94a3b8',family:'-apple-system,sans-serif'},
+     margin:{l:200,r:60,t:20,b:50},
+     xaxis:{type:'log',title:'Record Count (log scale)',color:'#64748b',gridcolor:'#1e293b'},
+     yaxis:{autorange:'reversed',color:'#94a3b8',tickfont:{size:13},ticksuffix:'  '},
+     legend:{orientation:'h',x:0.5,xanchor:'center',y:-0.18,font:{size:11}},
+     bargap:0.35,height:320},{responsive:true});
 }
-
 render().catch(console.error);
 </script>
 </body>
