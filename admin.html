@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin — Master Reference Library</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0f172a; --surface: #1e293b; --surface2: #162032; --border: #334155;
+      --text: #e2e8f0; --muted: #94a3b8; --dim: #64748b;
+      --green: #22c55e; --blue: #3b82f6; --amber: #f59e0b;
+      --red: #f87171; --purple: #a78bfa; --gold: #fbbf24;
+      --radius: 10px;
+    }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg); color: var(--text); min-height: 100vh; }
+    a { color: var(--blue); text-decoration: none; }
+
+    /* LOGIN GATE */
+    #login-gate { display: flex; align-items: center; justify-content: center;
+      min-height: 100vh; padding: 24px; }
+    .login-box { background: var(--surface); border: 1px solid var(--border);
+      border-radius: 14px; padding: 40px; max-width: 360px; width: 100%; text-align: center; }
+    .login-box h1 { font-size: 1.4rem; margin-bottom: 8px; }
+    .login-box p { font-size: 0.85rem; color: var(--muted); margin-bottom: 24px; }
+    .login-box input { width: 100%; padding: 11px 14px; background: var(--bg);
+      border: 1px solid var(--border); border-radius: 8px; color: var(--text);
+      font-size: 0.95rem; margin-bottom: 12px; font-family: inherit; }
+    .login-box input:focus { outline: none; border-color: var(--blue); }
+    #login-error { color: var(--red); font-size: 0.82rem; margin-top: 8px; min-height: 18px; }
+
+    /* LAYOUT */
+    #app { display: none; }
+    nav { background: var(--surface); border-bottom: 1px solid var(--border);
+      padding: 0 28px; display: flex; align-items: center; gap: 4px; height: 54px; }
+    nav .logo { font-weight: 700; font-size: 1rem; margin-right: 20px; color: var(--text); }
+    .nav-tab { padding: 8px 14px; border-radius: 7px; cursor: pointer; font-size: 0.88rem;
+      color: var(--muted); background: transparent; border: none; font-family: inherit;
+      transition: all .15s; }
+    .nav-tab:hover { color: var(--text); background: rgba(255,255,255,0.05); }
+    .nav-tab.active { color: var(--text); background: rgba(59,130,246,0.15); font-weight: 600; }
+    nav .spacer { flex: 1; }
+    nav .badge { background: var(--amber); color: #000; font-size: 0.72rem; font-weight: 700;
+      border-radius: 99px; padding: 2px 7px; margin-left: 4px; }
+    #logout-btn { font-size: 0.8rem; color: var(--dim); background: transparent;
+      border: 1px solid var(--border); border-radius: 6px; padding: 5px 11px;
+      cursor: pointer; font-family: inherit; }
+
+    main { max-width: 1200px; margin: 0 auto; padding: 28px 24px; }
+    .panel { display: none; }
+    .panel.active { display: block; }
+
+    /* STAT ROW */
+    .stat-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px,1fr));
+      gap: 12px; margin-bottom: 28px; }
+    .stat { background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 14px 16px; }
+    .stat .val { font-size: 1.5rem; font-weight: 700; }
+    .stat .lbl { font-size: 0.72rem; color: var(--dim); text-transform: uppercase;
+      letter-spacing: .05em; margin-top: 3px; }
+
+    /* QUEUE TABLE */
+    .queue-filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; align-items: center; }
+    .filter-btn { padding: 6px 14px; border-radius: 99px; border: 1px solid var(--border);
+      background: transparent; color: var(--muted); cursor: pointer; font-size: 0.82rem;
+      font-family: inherit; transition: all .15s; }
+    .filter-btn:hover { color: var(--text); }
+    .filter-btn.active { border-color: var(--blue); color: var(--blue); background: rgba(59,130,246,0.1); }
+    .filter-btn.amber { border-color: var(--amber); color: var(--amber); background: rgba(245,158,11,0.1); }
+    .filter-btn.green { border-color: var(--green); color: var(--green); background: rgba(34,197,94,0.1); }
+    .filter-btn.red   { border-color: var(--red);   color: var(--red);   background: rgba(248,113,113,0.1); }
+
+    .queue-list { display: flex; flex-direction: column; gap: 10px; }
+    .sub-card { background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); overflow: hidden; }
+    .sub-card.pending      { border-left: 3px solid var(--amber); }
+    .sub-card.under_review { border-left: 3px solid var(--blue); }
+    .sub-card.accepted     { border-left: 3px solid var(--green); }
+    .sub-card.rejected     { border-left: 3px solid var(--red); }
+    .sub-card.deferred     { border-left: 3px solid var(--purple); }
+    .sub-card.duplicate    { border-left: 3px solid var(--dim); }
+    .sub-header { padding: 14px 16px; display: flex; gap: 12px; align-items: flex-start;
+      cursor: pointer; }
+    .sub-header:hover { background: rgba(255,255,255,0.02); }
+    .sub-meta { flex: 1; min-width: 0; }
+    .sub-meta .row1 { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 4px; }
+    .badge { display: inline-block; font-size: 0.72rem; font-weight: 600; text-transform: uppercase;
+      letter-spacing: .04em; padding: 2px 8px; border-radius: 99px; }
+    .badge-pending      { background: rgba(245,158,11,.15); color: var(--amber); }
+    .badge-under_review { background: rgba(59,130,246,.15); color: var(--blue); }
+    .badge-accepted     { background: rgba(34,197,94,.15);  color: var(--green); }
+    .badge-rejected     { background: rgba(248,113,113,.15);color: var(--red); }
+    .badge-deferred     { background: rgba(167,139,250,.15);color: var(--purple); }
+    .badge-duplicate    { background: rgba(100,116,139,.15);color: var(--dim); }
+    .badge-type { background: rgba(59,130,246,.1); color: #93c5fd; }
+    .badge-table { background: rgba(34,197,94,.1); color: #86efac; }
+    .badge-file  { background: rgba(251,191,36,.1); color: var(--gold); }
+    .sub-desc { font-size: 0.85rem; color: var(--muted); white-space: nowrap;
+      overflow: hidden; text-overflow: ellipsis; max-width: 600px; }
+    .sub-submitter { font-size: 0.78rem; color: var(--dim); margin-top: 3px; }
+    .sub-actions { display: flex; gap: 6px; align-items: center; flex-shrink: 0; }
+
+    /* EXPAND PANEL */
+    .sub-body { display: none; padding: 0 16px 16px; border-top: 1px solid var(--border); }
+    .sub-body.open { display: block; }
+    .sub-body-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 14px 0; }
+    .detail-block { background: var(--surface2); border-radius: 8px; padding: 12px 14px; }
+    .detail-block .dlabel { font-size: 0.72rem; text-transform: uppercase; letter-spacing: .05em;
+      color: var(--dim); margin-bottom: 5px; }
+    .detail-block .dval { font-size: 0.88rem; color: var(--text); line-height: 1.5; word-break: break-word; }
+    .detail-block .dval a { color: var(--blue); }
+    .file-preview { margin-top: 12px; }
+    .file-preview h4 { font-size: 0.82rem; color: var(--muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: .05em; }
+    .preview-table { width: 100%; border-collapse: collapse; font-size: 0.78rem; overflow-x: auto; display: block; }
+    .preview-table th { background: rgba(59,130,246,0.1); color: var(--blue); padding: 5px 8px;
+      text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; }
+    .preview-table td { padding: 4px 8px; border-bottom: 1px solid rgba(51,65,85,0.5);
+      color: var(--muted); max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .reviewer-note-input { width: 100%; padding: 9px 12px; background: var(--bg);
+      border: 1px solid var(--border); border-radius: 7px; color: var(--text);
+      font-size: 0.88rem; font-family: inherit; resize: vertical; min-height: 70px;
+      margin-bottom: 10px; }
+    .reviewer-note-input:focus { outline: none; border-color: var(--blue); }
+    .action-row { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    /* BUTTONS */
+    .btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px;
+      border-radius: 7px; border: none; cursor: pointer; font-size: 0.85rem; font-weight: 600;
+      font-family: inherit; transition: all .15s; }
+    .btn-sm { padding: 5px 11px; font-size: 0.8rem; }
+    .btn-accept  { background: var(--green);  color: #fff; }
+    .btn-accept:hover  { background: #16a34a; }
+    .btn-reject  { background: var(--red);    color: #fff; }
+    .btn-reject:hover  { background: #dc2626; }
+    .btn-review  { background: var(--blue);   color: #fff; }
+    .btn-review:hover  { background: #2563eb; }
+    .btn-gold    { background: var(--gold);   color: #000; }
+    .btn-gold:hover    { background: #d97706; color: #fff; }
+    .btn-defer   { background: var(--purple); color: #fff; }
+    .btn-defer:hover   { background: #7c3aed; }
+    .btn-ghost  { background: transparent; color: var(--muted); border: 1px solid var(--border); }
+    .btn-ghost:hover { color: var(--text); }
+    .btn-login  { background: var(--blue); color: #fff; width: 100%; justify-content: center;
+      padding: 12px; font-size: 0.95rem; }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* GOLD MINE */
+    .gm-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px,1fr)); gap: 16px; }
+    .gm-card { background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 20px; position: relative; }
+    .gm-card.active  { border-color: rgba(251,191,36,.4); }
+    .gm-card.claimed { border-color: rgba(59,130,246,.4); }
+    .gm-card .gm-title { font-weight: 700; font-size: 1rem; margin-bottom: 6px; }
+    .gm-card .gm-why  { font-size: 0.82rem; color: var(--muted); margin-bottom: 8px; line-height: 1.5; }
+    .gm-card .gm-ask  { font-size: 0.82rem; background: rgba(251,191,36,.08);
+      border: 1px solid rgba(251,191,36,.2); border-radius: 6px; padding: 8px 10px;
+      color: #fde68a; margin-bottom: 10px; line-height: 1.5; }
+    .gm-card .gm-meta { font-size: 0.75rem; color: var(--dim); }
+    .gm-status-badge { position: absolute; top: 14px; right: 14px; }
+    .badge-gm-active    { background: rgba(251,191,36,.15); color: var(--gold); }
+    .badge-gm-claimed   { background: rgba(59,130,246,.15);  color: var(--blue); }
+    .badge-gm-resolved  { background: rgba(34,197,94,.15);   color: var(--green); }
+    .badge-gm-archived  { background: rgba(100,116,139,.15); color: var(--dim); }
+
+    /* WALL MANAGER */
+    .wall-admin-grid { display: flex; flex-direction: column; gap: 10px; }
+    .wall-row { background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 14px 16px; display: flex;
+      align-items: center; gap: 12px; flex-wrap: wrap; }
+    .wall-row .wname { font-weight: 600; font-size: 0.95rem; flex: 1; min-width: 120px; }
+    .wall-row .wmeta { font-size: 0.8rem; color: var(--dim); }
+
+    /* DONOR QUEUE */
+    .donor-row { background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 14px 16px; display: flex;
+      gap: 12px; align-items: flex-start; flex-wrap: wrap; margin-bottom: 10px; }
+    .donor-info { flex: 1; min-width: 200px; }
+    .donor-info .dname { font-weight: 700; font-size: 0.95rem; margin-bottom: 2px; }
+    .donor-info .dmeta { font-size: 0.8rem; color: var(--muted); }
+
+    /* TOAST */
+    #toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px);
+      background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+      padding: 12px 20px; font-size: 0.88rem; color: var(--text); z-index: 999;
+      transition: transform .3s; pointer-events: none; white-space: nowrap; }
+    #toast.show { transform: translateX(-50%) translateY(0); }
+    #toast.success { border-color: var(--green); color: var(--green); }
+    #toast.error   { border-color: var(--red);   color: var(--red); }
+    #toast.gold    { border-color: var(--gold);  color: var(--gold); }
+
+    .empty { text-align: center; color: var(--dim); padding: 48px; font-size: 0.9rem; }
+    .divider { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
+    @media (max-width: 640px) { .sub-body-grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+
+<!-- LOGIN GATE -->
+<div id="login-gate">
+  <div class="login-box">
+    <div style="font-size:2rem;margin-bottom:12px">🔐</div>
+    <h1>Admin Access</h1>
+    <p>Master Reference Library — internal review panel</p>
+    <input type="password" id="passphrase" placeholder="Enter passphrase" />
+    <button class="btn btn-login" onclick="checkLogin()">Enter</button>
+    <div id="login-error"></div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <nav>
+    <span class="logo">🌍 Ref Library — Admin</span>
+    <button class="nav-tab active" onclick="switchTab('queue',this)">📥 Review Queue <span class="badge" id="queue-badge">0</span></button>
+    <button class="nav-tab" onclick="switchTab('goldmine',this)">⛏️ Gold Mine</button>
+    <button class="nav-tab" onclick="switchTab('donors',this)">❤️ Donors</button>
+    <button class="nav-tab" onclick="switchTab('wall',this)">⭐ Wall</button>
+    <span class="spacer"></span>
+    <a href="index.html" style="font-size:0.8rem;color:var(--dim);margin-right:12px;">View Site</a>
+    <button id="logout-btn" onclick="logout()">Log out</button>
+  </nav>
+
+  <main>
+    <!-- REVIEW QUEUE -->
+    <div class="panel active" id="panel-queue">
+      <div class="stat-row" id="queue-stats"></div>
+      <div class="queue-filters">
+        <span style="font-size:0.82rem;color:var(--dim);">Filter:</span>
+        <button class="filter-btn active" onclick="filterQueue('all',this)">All</button>
+        <button class="filter-btn amber" onclick="filterQueue('pending',this)">Pending</button>
+        <button class="filter-btn active" onclick="filterQueue('under_review',this)">Under Review</button>
+        <button class="filter-btn green" onclick="filterQueue('accepted',this)">Accepted</button>
+        <button class="filter-btn red" onclick="filterQueue('rejected',this)">Rejected</button>
+        <button class="filter-btn" onclick="filterQueue('deferred',this)">Deferred</button>
+      </div>
+      <div class="queue-list" id="queue-list"><div class="empty">Loading submissions...</div></div>
+    </div>
+
+    <!-- GOLD MINE -->
+    <div class="panel" id="panel-goldmine">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+        <div>
+          <h2 style="font-size:1.2rem;font-weight:700;⛏️"> ⛏️ Gold Mine</h2>
+          <p style="font-size:0.85rem;color:var(--muted);margin-top:4px;">Submissions that weren’t ready but have potential — open for community refinement.</p>
+        </div>
+        <button class="btn btn-gold" onclick="openNewGoldMine()">+ Add to Gold Mine</button>
+      </div>
+      <div class="gm-grid" id="gm-grid"><div class="empty">Loading gold mine...</div></div>
+
+      <!-- New Gold Mine Modal -->
+      <div id="gm-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:100;display:none;align-items:center;justify-content:center;padding:24px;">
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:28px;max-width:560px;width:100%;max-height:90vh;overflow-y:auto;">
+          <h3 style="font-size:1.1rem;font-weight:700;margin-bottom:16px;">⛏️ Add to Gold Mine</h3>
+          <div style="display:flex;flex-direction:column;gap:12px;">
+            <div><label style="font-size:0.78rem;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;display:block;margin-bottom:4px;">Title *</label>
+              <input id="gm-title" type="text" placeholder="Short descriptive title" style="width:100%;padding:9px 12px;background:var(--bg);border:1px solid var(--border);border-radius:7px;color:var(--text);font-size:0.88rem;font-family:inherit;"/></div>
+            <div><label style="font-size:0.78rem;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;display:block;margin-bottom:4px;">What data does it contain? *</label>
+              <textarea id="gm-desc" rows="3" placeholder="Describe what the data contains and why it has potential..." style="width:100%;padding:9px 12px;background:var(--bg);border:1px solid var(--border);border-radius:7px;color:var(--text);font-size:0.88rem;font-family:inherit;resize:vertical;"></textarea></div>
+            <div><label style="font-size:0.78rem;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;display:block;margin-bottom:4px;">Why wasn’t it accepted as-is?</label>
+              <textarea id="gm-why" rows="2" placeholder="Be honest and specific — this helps the community improve it" style="width:100%;padding:9px 12px;background:var(--bg);border:1px solid var(--border);border-radius:7px;color:var(--text);font-size:0.88rem;font-family:inherit;resize:vertical;"></textarea></div>
+            <div><label style="font-size:0.78rem;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;display:block;margin-bottom:4px;">What improvement is needed? *</label>
+              <textarea id="gm-improvement" rows="2" placeholder="Specific ask: e.g. 'Needs standardized ISO codes' or 'Missing population data'" style="width:100%;padding:9px 12px;background:var(--bg);border:1px solid var(--border);border-radius:7px;color:var(--text);font-size:0.88rem;font-family:inherit;resize:vertical;"></textarea></div>
+            <div><label style="font-size:0.78rem;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;display:block;margin-bottom:4px;">Target Dataset *</label>
+              <select id="gm-table" style="width:100%;padding:9px 12px;background:var(--bg);border:1px solid var(--border);border-radius:7px;color:var(--text);font-size:0.88rem;font-family:inherit;">
+                <option value="countries">Countries</option>
+                <option value="admin_level1">States / Provinces</option>
+                <option value="admin_level2">Counties / Districts</option>
+                <option value="admin_level3">Cities / Municipalities</option>
+                <option value="concepts">Concepts</option>
+                <option value="glossary">Glossary</option>
+                <option value="other">Other</option>
+              </select></div>
+            <div><label style="font-size:0.78rem;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;display:block;margin-bottom:4px;">Original Submitter Credit</label>
+              <input id="gm-credit" type="text" placeholder="e.g. Submitted by Jane D." style="width:100%;padding:9px 12px;background:var(--bg);border:1px solid var(--border);border-radius:7px;color:var(--text);font-size:0.88rem;font-family:inherit;"/></div>
+            <div><label style="font-size:0.78rem;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;display:block;margin-bottom:4px;">Linked Submission ID (optional)</label>
+              <input id="gm-sub-id" type="text" placeholder="UUID of original submission" style="width:100%;padding:9px 12px;background:var(--bg);border:1px solid var(--border);border-radius:7px;color:var(--text);font-size:0.88rem;font-family:inherit;"/></div>
+          </div>
+          <div style="display:flex;gap:10px;margin-top:20px;">
+            <button class="btn btn-gold" onclick="saveGoldMine()">⛏️ Add to Gold Mine</button>
+            <button class="btn btn-ghost" onclick="closeGoldMineModal()">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DONORS -->
+    <div class="panel" id="panel-donors">
+      <h2 style="font-size:1.1rem;font-weight:700;margin-bottom:6px;">Donor Queue</h2>
+      <p style="font-size:0.85rem;color:var(--muted);margin-bottom:20px;">Donors who filled out the form. Verify PayPal payment before promoting to the recognition wall.</p>
+      <div id="donor-list"><div class="empty">Loading donors...</div></div>
+    </div>
+
+    <!-- WALL -->
+    <div class="panel" id="panel-wall">
+      <h2 style="font-size:1.1rem;font-weight:700;margin-bottom:6px;">Recognition Wall Manager</h2>
+      <p style="font-size:0.85rem;color:var(--muted);margin-bottom:20px;">Promote donors, reorder, hide, or feature entries.</p>
+      <div id="wall-admin-list"><div class="empty">Loading wall...</div></div>
+    </div>
+  </main>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const PASSPHRASE = 'reflib-admin-2026'; // Change this to your own passphrase
+const SUPABASE_URL = 'https://nmemmfblpzrkwyljpmvp.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5tZW1tZmJscHpya3d5bGpwbXZwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxNDUzNzUsImV4cCI6MjA5MjcyMTM3NX0.iAEq-vnY481qdX0nmsonoDZWNFyFrao02GB_MS5BPzs';
+const { createClient } = supabase;
+const db = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let allSubmissions = [];
+let currentFilter = 'all';
+let pendingGoldMineSubId = null;
+
+// ---- AUTH ----
+function checkLogin() {
+  const val = document.getElementById('passphrase').value;
+  if (val === PASSPHRASE) {
+    sessionStorage.setItem('rl_admin', '1');
+    document.getElementById('login-gate').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    init();
+  } else {
+    document.getElementById('login-error').textContent = 'Incorrect passphrase.';
+  }
+}
+document.getElementById('passphrase').addEventListener('keydown', e => { if (e.key==='Enter') checkLogin(); });
+function logout() { sessionStorage.removeItem('rl_admin'); location.reload(); }
+if (sessionStorage.getItem('rl_admin') === '1') {
+  document.getElementById('login-gate').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  window.addEventListener('DOMContentLoaded', init);
+}
+
+// ---- TABS ----
+function switchTab(id, el) {
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('panel-' + id).classList.add('active');
+  if (id === 'goldmine') loadGoldMine();
+  if (id === 'donors')   loadDonors();
+  if (id === 'wall')     loadWall();
+}
+
+// ---- TOAST ----
+function toast(msg, type='') {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.className = 'show ' + type;
+  setTimeout(() => { el.className = ''; }, 3200);
+}
+
+// ---- INIT ----
+async function init() {
+  await loadQueue();
+}
+
+// ---- REVIEW QUEUE ----
+async function loadQueue() {
+  const { data } = await db.from('submissions')
+    .select('*, contributors(display_name,email,country_id), submission_files(id,original_name,file_type,row_count,column_headers,preview_json,storage_path)')
+    .order('created_at', { ascending: true });
+  allSubmissions = data || [];
+
+  // Stats
+  const counts = { pending:0, under_review:0, accepted:0, rejected:0, deferred:0, duplicate:0 };
+  allSubmissions.forEach(s => { if (counts[s.status] !== undefined) counts[s.status]++; });
+  const pending = counts.pending + counts.under_review;
+  document.getElementById('queue-badge').textContent = pending;
+  document.getElementById('queue-stats').innerHTML = [
+    ['Total', allSubmissions.length, 'var(--muted)'],
+    ['Pending', counts.pending, 'var(--amber)'],
+    ['Under Review', counts.under_review, 'var(--blue)'],
+    ['Accepted', counts.accepted, 'var(--green)'],
+    ['Rejected', counts.rejected, 'var(--red)'],
+    ['Deferred', counts.deferred, 'var(--purple)'],
+  ].map(([l,v,c]) => `<div class="stat"><div class="val" style="color:${c}">${v}</div><div class="lbl">${l}</div></div>`).join('');
+
+  renderQueue();
+}
+
+function renderQueue() {
+  const filtered = currentFilter === 'all' ? allSubmissions
+    : allSubmissions.filter(s => s.status === currentFilter);
+  const list = document.getElementById('queue-list');
+  if (!filtered.length) { list.innerHTML = '<div class="empty">No submissions match this filter.</div>'; return; }
+
+  list.innerHTML = filtered.map(s => {
+    const files = s.submission_files || [];
+    const name = s.contributors?.display_name || s.submitter_name || 'Anonymous';
+    const email = s.contributors?.email || s.submitter_email || '';
+    const date = new Date(s.created_at).toLocaleDateString('en-US', {month:'short',day:'numeric',year:'numeric'});
+    return `
+    <div class="sub-card ${s.status}" id="card-${s.id}">
+      <div class="sub-header" onclick="toggleCard('${s.id}')">
+        <div class="sub-meta">
+          <div class="row1">
+            <span class="badge badge-${s.status}">${s.status.replace('_',' ')}</span>
+            <span class="badge badge-type">${s.type.replace('_',' ')}</span>
+            <span class="badge badge-table">${s.target_table}</span>
+            ${files.length ? `<span class="badge badge-file">📄 ${files.length} file${files.length>1?'s':''}</span>` : ''}
+            <span style="font-size:0.75rem;color:var(--dim);">${date}</span>
+          </div>
+          <div class="sub-desc">${s.description}</div>
+          <div class="sub-submitter">${name}${email ? ' · ' + email : ''}</div>
+        </div>
+        <div class="sub-actions">
+          <span style="font-size:0.75rem;color:var(--dim);">#${s.id.slice(0,8)}</span>
+        </div>
+      </div>
+      <div class="sub-body" id="body-${s.id}">
+        <div class="sub-body-grid">
+          <div class="detail-block"><div class="dlabel">Full Description</div><div class="dval">${s.description}</div></div>
+          <div class="detail-block"><div class="dlabel">Source</div><div class="dval">${s.source_url ? `<a href="${s.source_url}" target="_blank">${s.source_title || s.source_url}</a>` : s.source_title || '<span style="color:var(--dim)">None provided</span>'}</div></div>
+          <div class="detail-block"><div class="dlabel">Submitter</div><div class="dval">${name}${email?'<br>'+email:''}</div></div>
+          <div class="detail-block"><div class="dlabel">Submission ID</div><div class="dval" style="font-family:monospace;font-size:0.8rem;">${s.id}</div></div>
+        </div>
+        ${files.length ? renderFilePreview(files) : ''}
+        ${s.reviewer_note ? `<div class="detail-block" style="margin-bottom:12px;"><div class="dlabel">Previous Reviewer Note</div><div class="dval">${s.reviewer_note}</div></div>` : ''}
+        <textarea class="reviewer-note-input" id="note-${s.id}" placeholder="Reviewer note (sent to submitter, also visible in admin)...">${s.reviewer_note||''}</textarea>
+        <div class="action-row">
+          <button class="btn btn-sm btn-accept"  onclick="updateStatus('${s.id}','accepted')">✅ Accept</button>
+          <button class="btn btn-sm btn-reject"  onclick="updateStatus('${s.id}','rejected')">❌ Reject</button>
+          <button class="btn btn-sm btn-review"  onclick="updateStatus('${s.id}','under_review')">🔍 Mark Under Review</button>
+          <button class="btn btn-sm btn-gold"    onclick="sendToGoldMine('${s.id}')">⛏️ Send to Gold Mine</button>
+          <button class="btn btn-sm btn-defer"   onclick="updateStatus('${s.id}','deferred')">⏳ Defer</button>
+          <button class="btn btn-sm btn-ghost"   onclick="updateStatus('${s.id}','duplicate')">🔄 Duplicate</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderFilePreview(files) {
+  return files.map(f => {
+    let preview = '';
+    if (f.preview_json && Array.isArray(f.preview_json) && f.preview_json.length) {
+      const headers = Object.keys(f.preview_json[0]);
+      preview = `<table class="preview-table"><thead><tr>${headers.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>`
+        + f.preview_json.slice(0,8).map(row=>`<tr>${headers.map(h=>`<td title="${row[h]??''}"><${row[h]??''}</td>`).join('')}</tr>`).join('')
+        + `</tbody></table>`;
+    } else if (f.column_headers?.length) {
+      preview = `<div style="font-size:0.8rem;color:var(--muted);">Columns: ${f.column_headers.join(', ')}</div>`;
+    }
+    return `<div class="file-preview">
+      <h4>📄 ${f.original_name} (${f.file_type}${f.row_count ? ' · ' + f.row_count.toLocaleString() + ' rows' : ''})
+        <a href="#" onclick="downloadFile('${f.storage_path}')" style="margin-left:8px;font-size:0.78rem;">⬇️ Download</a>
+      </h4>
+      ${preview}
+    </div>`;
+  }).join('');
+}
+
+function toggleCard(id) {
+  document.getElementById('body-' + id).classList.toggle('open');
+}
+
+function filterQueue(status, el) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active','amber','green','red'));
+  el.classList.add('active');
+  currentFilter = status;
+  renderQueue();
+}
+
+async function updateStatus(id, status) {
+  const note = document.getElementById('note-' + id)?.value?.trim() || null;
+  const { error } = await db.from('submissions').update({
+    status, reviewer_note: note, reviewed_at: new Date().toISOString(), updated_at: new Date().toISOString()
+  }).eq('id', id);
+  if (error) { toast('Error updating: ' + error.message, 'error'); return; }
+
+  // Log event
+  const sub = allSubmissions.find(s => s.id === id);
+  await db.from('submission_events').insert({
+    submission_id: id, from_status: sub?.status, to_status: status,
+    note, actor: 'reviewer'
+  });
+
+  // Update accepted_count on contributor
+  if (status === 'accepted' && sub?.contributor_id) {
+    await db.rpc('increment_accepted_count', { contrib_id: sub.contributor_id }).catch(()=>{});
+  }
+
+  toast(status === 'accepted' ? '✅ Accepted!' : status === 'rejected' ? '❌ Rejected' : '🟡 Status updated', status === 'accepted' ? 'success' : '');
+  await loadQueue();
+}
+
+async function downloadFile(path) {
+  const { data, error } = await db.storage.from('submissions').createSignedUrl(path, 60);
+  if (error) { toast('Could not get download link', 'error'); return; }
+  window.open(data.signedUrl, '_blank');
+}
+
+// ---- GOLD MINE ----
+function sendToGoldMine(subId) {
+  pendingGoldMineSubId = subId;
+  const sub = allSubmissions.find(s => s.id === subId);
+  if (sub) {
+    document.getElementById('gm-title').value = sub.target_table + ' — ' + sub.type.replace('_',' ');
+    document.getElementById('gm-desc').value = sub.description;
+    document.getElementById('gm-table').value = sub.target_table;
+    document.getElementById('gm-sub-id').value = subId;
+    const name = sub.contributors?.display_name || sub.submitter_name || '';
+    if (name) document.getElementById('gm-credit').value = 'Originally submitted by ' + name;
+  }
+  document.getElementById('gm-modal').style.display = 'flex';
+}
+function openNewGoldMine() { pendingGoldMineSubId = null; document.getElementById('gm-modal').style.display = 'flex'; }
+function closeGoldMineModal() { document.getElementById('gm-modal').style.display = 'none'; }
+
+async function saveGoldMine() {
+  const title       = document.getElementById('gm-title').value.trim();
+  const desc        = document.getElementById('gm-desc').value.trim();
+  const why         = document.getElementById('gm-why').value.trim();
+  const improvement = document.getElementById('gm-improvement').value.trim();
+  const table       = document.getElementById('gm-table').value;
+  const credit      = document.getElementById('gm-credit').value.trim();
+  const subId       = document.getElementById('gm-sub-id').value.trim() || pendingGoldMineSubId || null;
+  if (!title || !desc || !improvement) { toast('Fill in required fields', 'error'); return; }
+
+  const { error } = await db.from('goldmine').insert({
+    title, description: desc, why_rejected: why || null,
+    improvement_needed: improvement, target_table: table,
+    original_submitter_credit: credit || null,
+    original_submission_id: subId,
+    status: 'active'
+  });
+  if (error) { toast('Error: ' + error.message, 'error'); return; }
+
+  // If linked to a submission, mark it as deferred (not rejected — there’s gold there)
+  if (subId) {
+    await db.from('submissions').update({ status: 'deferred', reviewer_note: 'Moved to Gold Mine for community improvement.' }).eq('id', subId);
+    await db.from('submission_events').insert({ submission_id: subId, from_status: 'pending', to_status: 'deferred', note: 'Sent to Gold Mine', actor: 'reviewer' });
+  }
+
+  toast('⛏️ Added to Gold Mine!', 'gold');
+  closeGoldMineModal();
+  await loadQueue();
+  await loadGoldMine();
+}
+
+async function loadGoldMine() {
+  const { data } = await db.from('goldmine').select('*').neq('status','archived').order('created_at', { ascending: false });
+  const grid = document.getElementById('gm-grid');
+  if (!data?.length) { grid.innerHTML = '<div class="empty">No gold mine entries yet. Reject a submission with potential to add one.</div>'; return; }
+  const statusLabel = { active:'Open', claimed:'Claimed', resubmitted:'Resubmitted', resolved:'Resolved', archived:'Archived' };
+  grid.innerHTML = data.map(g => `
+    <div class="gm-card ${g.status}">
+      <span class="badge badge-gm-${g.status} gm-status-badge">${statusLabel[g.status]||g.status}</span>
+      <div class="gm-title">${g.title}</div>
+      <div class="gm-why">${g.description}</div>
+      ${g.why_rejected ? `<div style="font-size:0.78rem;color:var(--dim);margin-bottom:6px;"><strong>Why it wasn’t ready:</strong> ${g.why_rejected}</div>` : ''}
+      <div class="gm-ask">✨ Needed: ${g.improvement_needed}</div>
+      <div class="gm-meta">
+        ${g.target_table} · ${g.view_count} views · ${g.claim_count} claimed
+        ${g.original_submitter_credit ? ' · ' + g.original_submitter_credit : ''}
+      </div>
+      <div style="display:flex;gap:6px;margin-top:12px;flex-wrap:wrap;">
+        <button class="btn btn-sm btn-ghost" onclick="updateGMStatus('${g.id}','claimed')">📌 Claim</button>
+        <button class="btn btn-sm btn-accept" onclick="updateGMStatus('${g.id}','resolved')">✅ Resolve</button>
+        <button class="btn btn-sm btn-ghost" onclick="updateGMStatus('${g.id}','archived')">🗄️ Archive</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+async function updateGMStatus(id, status) {
+  await db.from('goldmine').update({ status, updated_at: new Date().toISOString() }).eq('id', id);
+  toast('Gold mine entry updated', 'gold');
+  await loadGoldMine();
+}
+
+// ---- DONORS ----
+async function loadDonors() {
+  const { data } = await db.from('donations')
+    .select('*, contributors(display_name, email, support_tier, recognition_visibility, recognition_note, website_url, social_handle, total_donated_usd)')
+    .order('created_at', { ascending: false });
+  const list = document.getElementById('donor-list');
+  if (!data?.length) { list.innerHTML = '<div class="empty">No donations yet.</div>'; return; }
+  list.innerHTML = data.map(d => {
+    const c = d.contributors || {};
+    const vis = d.recognition_visibility;
+    return `
+    <div class="donor-row">
+      <div class="donor-info">
+        <div class="dname">${c.display_name || 'Anonymous'}
+          <span class="badge badge-${d.tier || 'supporter'}" style="margin-left:6px;">${d.tier||'supporter'}</span></div>
+        <div class="dmeta">${c.email || ''} · $${parseFloat(d.amount_usd).toFixed(2)} · ${new Date(d.created_at).toLocaleDateString()}</div>
+        ${c.recognition_note ? `<div style="font-size:0.82rem;color:var(--muted);margin-top:4px;font-style:italic;">&ldquo;${c.recognition_note}&rdquo;</div>` : ''}
+        <div style="font-size:0.75rem;color:var(--dim);margin-top:3px;">Visibility: ${vis} ${c.website_url ? '· <a href="'+c.website_url+'" target="_blank">'+c.website_url+'</a>' : ''}</div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;flex-shrink:0;">
+        ${vis === 'public' ? `<button class="btn btn-sm btn-gold" onclick="promoteToWall('${d.contributor_id}','${c.display_name||''}','${d.tier||'supporter'}','${(c.recognition_note||'').replace(/'/g,"\\'")}')">⭐ Add to Wall</button>` : `<span style="font-size:0.8rem;color:var(--dim);">No wall (${vis})</span>`}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function promoteToWall(contributorId, name, tier, note) {
+  if (!name) { toast('No display name', 'error'); return; }
+  const { data: c } = await db.from('contributors').select('website_url,social_handle').eq('id', contributorId).single();
+  const { error } = await db.from('recognition_wall').insert({
+    contributor_id: contributorId,
+    display_name: name, tier,
+    recognition_note: note || null,
+    website_url: c?.website_url || null,
+    social_handle: c?.social_handle || null,
+    is_visible: true, featured: tier === 'champion',
+    sort_order: tier === 'champion' ? 0 : tier === 'patron' ? 10 : 50
+  });
+  if (error) { toast('Error: ' + error.message, 'error'); return; }
+  toast('⭐ Added to recognition wall!', 'success');
+  await loadDonors();
+}
+
+// ---- WALL ----
+async function loadWall() {
+  const { data } = await db.from('recognition_wall').select('*').order('sort_order').order('created_at');
+  const list = document.getElementById('wall-admin-list');
+  if (!data?.length) { list.innerHTML = '<div class="empty">No wall entries yet.</div>'; return; }
+  list.innerHTML = '<div class="wall-admin-grid">' + data.map(w => `
+    <div class="wall-row">
+      <div class="wname">${w.display_name}
+        <span class="badge badge-${w.tier}" style="margin-left:6px;">${w.tier}</span>
+        ${w.featured ? '<span class="badge" style="background:rgba(251,191,36,.2);color:var(--gold);margin-left:4px;">⭐ Featured</span>' : ''}
+        ${!w.is_visible ? '<span class="badge" style="background:rgba(100,116,139,.2);color:var(--dim);margin-left:4px;">Hidden</span>' : ''}
+      </div>
+      <div class="wmeta">${w.recognition_note ? '&ldquo;'+w.recognition_note.slice(0,60)+'...&rdquo;' : 'No note'}</div>
+      <div style="display:flex;gap:6px;">
+        <button class="btn btn-sm btn-ghost" onclick="toggleWallVisibility('${w.id}',${w.is_visible})">${w.is_visible?'🚫 Hide':'👁 Show'}</button>
+        <button class="btn btn-sm btn-gold" onclick="toggleFeatured('${w.id}',${w.featured})">${w.featured?'Unfeature':'⭐ Feature'}</button>
+      </div>
+    </div>
+  `).join('') + '</div>';
+}
+
+async function toggleWallVisibility(id, current) {
+  await db.from('recognition_wall').update({ is_visible: !current }).eq('id', id);
+  toast('Wall entry updated', 'success');
+  await loadWall();
+}
+async function toggleFeatured(id, current) {
+  await db.from('recognition_wall').update({ featured: !current }).eq('id', id);
+  toast('Featured status updated', 'gold');
+  await loadWall();
+}
+</script>
+</body>
+</html>

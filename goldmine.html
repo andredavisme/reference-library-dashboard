@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gold Mine — Master Reference Library</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0f172a; --surface: #1e293b; --border: #334155;
+      --text: #e2e8f0; --muted: #94a3b8; --dim: #64748b;
+      --green: #22c55e; --blue: #3b82f6; --amber: #f59e0b;
+      --gold: #fbbf24; --purple: #a78bfa;
+      --radius: 10px;
+    }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg); color: var(--text); min-height: 100vh; padding: 32px 24px; }
+    a { color: var(--blue); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    nav { max-width: 960px; margin: 0 auto 32px; display: flex; gap: 16px; align-items: center; }
+    nav a { font-size: 0.85rem; color: var(--muted); padding: 6px 12px; border-radius: 6px;
+      border: 1px solid transparent; transition: all .15s; }
+    nav a:hover, nav a.active { border-color: var(--border); color: var(--text); text-decoration: none; }
+    nav .logo { font-weight: 700; color: var(--text); font-size: 1rem; margin-right: auto; }
+    header { max-width: 960px; margin: 0 auto 32px; }
+    header h1 { font-size: 2rem; font-weight: 800; margin-bottom: 10px; }
+    header h1 span { color: var(--gold); }
+    header p { color: var(--muted); font-size: 1rem; line-height: 1.6; max-width: 640px; }
+    .gm-grid { max-width: 960px; margin: 0 auto; display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px,1fr)); gap: 18px; }
+    .gm-card { background: var(--surface); border: 1px solid rgba(251,191,36,.25);
+      border-radius: var(--radius); padding: 22px; position: relative;
+      transition: border-color .15s; }
+    .gm-card:hover { border-color: rgba(251,191,36,.5); }
+    .gm-card.claimed { border-color: rgba(59,130,246,.3); }
+    .gm-card.resolved { border-color: rgba(34,197,94,.3); opacity: 0.7; }
+    .status-badge { position: absolute; top: 14px; right: 14px; font-size: 0.72rem;
+      font-weight: 600; text-transform: uppercase; letter-spacing: .05em;
+      padding: 2px 8px; border-radius: 99px; }
+    .badge-active   { background: rgba(251,191,36,.15); color: var(--gold); }
+    .badge-claimed  { background: rgba(59,130,246,.15);  color: var(--blue); }
+    .badge-resolved { background: rgba(34,197,94,.15);   color: var(--green); }
+    .gm-card .icon { font-size: 1.4rem; margin-bottom: 10px; }
+    .gm-card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 6px; padding-right: 70px; }
+    .gm-card .desc { font-size: 0.85rem; color: var(--muted); line-height: 1.6; margin-bottom: 12px; }
+    .ask-box { background: rgba(251,191,36,.07); border: 1px solid rgba(251,191,36,.2);
+      border-radius: 7px; padding: 10px 12px; margin-bottom: 12px; }
+    .ask-box .ask-label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: .05em;
+      color: var(--gold); margin-bottom: 4px; font-weight: 600; }
+    .ask-box .ask-text { font-size: 0.85rem; color: #fde68a; line-height: 1.5; }
+    .why-box { font-size: 0.78rem; color: var(--dim); margin-bottom: 10px; line-height: 1.5;
+      padding: 8px 10px; background: rgba(100,116,139,.08); border-radius: 6px; }
+    .gm-meta { font-size: 0.75rem; color: var(--dim); margin-bottom: 14px; }
+    .btn { display: inline-flex; align-items: center; gap: 6px; padding: 9px 18px;
+      border-radius: 8px; border: none; cursor: pointer; font-size: 0.85rem; font-weight: 600;
+      font-family: inherit; transition: all .15s; }
+    .btn-gold  { background: var(--gold); color: #000; }
+    .btn-gold:hover  { background: #d97706; color: #fff; }
+    .btn-ghost { background: transparent; color: var(--muted); border: 1px solid var(--border); }
+    .btn-ghost:hover { color: var(--text); }
+    .claim-form { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border); display: none; }
+    .claim-form.open { display: block; }
+    .claim-form input, .claim-form textarea {
+      width: 100%; padding: 8px 11px; background: #0f172a; border: 1px solid var(--border);
+      border-radius: 6px; color: var(--text); font-size: 0.85rem; font-family: inherit;
+      margin-bottom: 8px; }
+    .claim-form textarea { resize: vertical; min-height: 70px; }
+    .claim-form input:focus, .claim-form textarea:focus { outline: none; border-color: var(--blue); }
+    #toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px);
+      background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+      padding: 12px 20px; font-size: 0.88rem; color: var(--text); z-index: 999;
+      transition: transform .3s; pointer-events: none; }
+    #toast.show { transform: translateX(-50%) translateY(0); }
+    #toast.success { border-color: var(--green); color: var(--green); }
+    #toast.gold    { border-color: var(--gold);  color: var(--gold); }
+    .empty { text-align: center; color: var(--dim); padding: 60px; font-size: 0.9rem; }
+    footer { max-width: 960px; margin: 40px auto 0; font-size: 0.78rem; color: var(--dim); text-align: center; }
+  </style>
+</head>
+<body>
+<nav>
+  <span class="logo">🌍 Ref Library</span>
+  <a href="index.html">Dashboard</a>
+  <a href="contribute.html">Contribute</a>
+  <a href="goldmine.html" class="active">⛏️ Gold Mine</a>
+</nav>
+
+<header>
+  <h1>⛏️ The <span>Gold Mine</span></h1>
+  <p>These are data submissions that weren’t quite ready for the library — but there’s something valuable here. Pick one up, improve it, and resubmit. Every contribution counts.</p>
+</header>
+
+<div class="gm-grid" id="gm-grid"><div class="empty">Loading...</div></div>
+
+<footer>
+  Master Reference Library · <a href="contribute.html">Submit Data</a> · <a href="index.html">Dashboard</a>
+</footer>
+
+<div id="toast"></div>
+
+<script>
+const SUPABASE_URL = 'https://nmemmfblpzrkwyljpmvp.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5tZW1tZmJscHpya3d5bGpwbXZwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxNDUzNzUsImV4cCI6MjA5MjcyMTM3NX0.iAEq-vnY481qdX0nmsonoDZWNFyFrao02GB_MS5BPzs';
+const { createClient } = supabase;
+const db = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+function toast(msg, type='') {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.className = 'show ' + type;
+  setTimeout(() => { el.className = ''; }, 3000);
+}
+
+async function load() {
+  const { data } = await db.from('goldmine')
+    .select('*').in('status', ['active','claimed']).order('created_at', { ascending: false });
+  const grid = document.getElementById('gm-grid');
+  if (!data?.length) {
+    grid.innerHTML = `<div class="empty">
+      <div style="font-size:2.5rem;margin-bottom:14px">⛏️</div>
+      <div style="font-size:1rem;color:var(--muted);margin-bottom:8px;">No gold yet — check back soon.</div>
+      <div>When submissions show promise but need work, they’ll appear here for the community to improve.</div>
+    </div>`;
+    return;
+  }
+  grid.innerHTML = data.map(g => `
+    <div class="gm-card ${g.status}" id="card-${g.id}">
+      <span class="status-badge badge-${g.status}">${g.status === 'active' ? 'Open' : 'Claimed'}</span>
+      <div class="icon">⛏️</div>
+      <h3>${g.title}</h3>
+      <div class="desc">${g.description}</div>
+      ${g.why_rejected ? `<div class="why-box"><strong>Why it wasn’t ready:</strong> ${g.why_rejected}</div>` : ''}
+      <div class="ask-box">
+        <div class="ask-label">✨ What’s needed</div>
+        <div class="ask-text">${g.improvement_needed}</div>
+      </div>
+      <div class="gm-meta">
+        Dataset: ${g.target_table}
+        ${g.original_submitter_credit ? ' · ' + g.original_submitter_credit : ''}
+        · ${g.view_count} views
+      </div>
+      ${g.status === 'active' ? `
+        <button class="btn btn-gold" onclick="toggleClaim('${g.id}')">⛏️ Claim &amp; Improve</button>
+        <div class="claim-form" id="claim-${g.id}">
+          <input type="text" id="cn-${g.id}" placeholder="Your name" />
+          <input type="email" id="ce-${g.id}" placeholder="Your email (optional)" />
+          <textarea id="cm-${g.id}" placeholder="What will you work on? Any questions?"></textarea>
+          <div style="display:flex;gap:8px;">
+            <button class="btn btn-gold" onclick="submitClaim('${g.id}')">Submit Claim</button>
+            <button class="btn btn-ghost" onclick="toggleClaim('${g.id}')">Cancel</button>
+          </div>
+        </div>` : `<div style="font-size:0.82rem;color:var(--blue);margin-top:8px;">Someone is working on this — ${g.claimed_by_name || 'a community member'}.</div>`
+      }
+    </div>
+  `).join('');
+
+  // Increment view counts
+  data.forEach(g => db.from('goldmine').update({ view_count: (g.view_count||0) + 1 }).eq('id', g.id).then(()=>{}));
+}
+
+function toggleClaim(id) {
+  document.getElementById('claim-' + id).classList.toggle('open');
+}
+
+async function submitClaim(id) {
+  const name  = document.getElementById('cn-' + id).value.trim();
+  const email = document.getElementById('ce-' + id).value.trim();
+  const msg   = document.getElementById('cm-' + id).value.trim();
+  if (!name) { toast('Please enter your name', 'error'); return; }
+
+  await db.from('goldmine').update({
+    status: 'claimed', claimed_by_name: name, claimed_at: new Date().toISOString(),
+    claim_count: 1, updated_at: new Date().toISOString()
+  }).eq('id', id);
+
+  if (msg) {
+    await db.from('goldmine_comments').insert({ goldmine_id: id, author_name: name, author_email: email || null, body: msg });
+  }
+
+  toast('⛏️ Claimed! Go dig up some gold.', 'gold');
+  await load();
+}
+
+load();
+</script>
+</body>
+</html>
