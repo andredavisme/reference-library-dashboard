@@ -19,19 +19,16 @@
     a { color: var(--blue); text-decoration: none; }
     a:hover { text-decoration: underline; }
 
-    /* NAV */
     nav { max-width: 900px; margin: 0 auto 32px; display: flex; gap: 16px; align-items: center; }
     nav a { font-size: 0.85rem; color: var(--muted); padding: 6px 12px; border-radius: 6px;
       border: 1px solid transparent; transition: all .15s; }
     nav a:hover, nav a.active { border-color: var(--border); color: var(--text); text-decoration: none; }
     nav .logo { font-weight: 700; color: var(--text); font-size: 1rem; margin-right: auto; }
 
-    /* HEADER */
     header { max-width: 900px; margin: 0 auto 40px; }
     header h1 { font-size: 2rem; font-weight: 800; margin-bottom: 10px; }
     header p { color: var(--muted); font-size: 1rem; line-height: 1.6; max-width: 640px; }
 
-    /* SECTION TABS */
     .tabs { max-width: 900px; margin: 0 auto 32px; display: flex; gap: 8px; flex-wrap: wrap; }
     .tab { padding: 9px 20px; border-radius: 8px; border: 1px solid var(--border);
       background: transparent; color: var(--muted); cursor: pointer; font-size: 0.9rem;
@@ -39,16 +36,13 @@
     .tab:hover { color: var(--text); border-color: #475569; }
     .tab.active { background: var(--blue); border-color: var(--blue); color: #fff; font-weight: 600; }
 
-    /* PANELS */
     .panel { display: none; max-width: 900px; margin: 0 auto; }
     .panel.active { display: block; }
 
-    /* CARDS */
     .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px; margin-bottom: 24px; }
     .card h2 { font-size: 1.1rem; font-weight: 700; margin-bottom: 6px; }
     .card p.sub { font-size: 0.85rem; color: var(--muted); margin-bottom: 20px; line-height: 1.5; }
 
-    /* FORM */
     .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
     .form-grid .full { grid-column: 1 / -1; }
     label { display: block; font-size: 0.82rem; color: var(--muted); margin-bottom: 5px; letter-spacing: .03em; text-transform: uppercase; }
@@ -63,22 +57,19 @@
     .field { margin-bottom: 0; }
     .hint { font-size: 0.78rem; color: var(--dim); margin-top: 5px; }
 
-    /* BUTTONS */
     .btn { display: inline-flex; align-items: center; gap: 8px; padding: 11px 22px;
       border-radius: 8px; border: none; cursor: pointer; font-size: 0.9rem; font-weight: 600;
       font-family: inherit; transition: all .15s; }
     .btn-primary { background: var(--blue); color: #fff; }
     .btn-primary:hover { background: #2563eb; }
-    .btn-green { background: var(--green); color: #fff; }
-    .btn-green:hover { background: #16a34a; }
+    .btn-paypal { background: #0070ba; color: #fff; }
+    .btn-paypal:hover { background: #005ea6; }
     .btn-ghost { background: transparent; color: var(--muted); border: 1px solid var(--border); }
     .btn-ghost:hover { color: var(--text); border-color: #475569; }
     .btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-    /* DIVIDER */
     .divider { border: none; border-top: 1px solid var(--border); margin: 24px 0; }
 
-    /* STATS STRIP */
     .stats-strip { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px,1fr)); gap: 12px; margin-bottom: 28px; }
     .stat { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
       padding: 14px 16px; }
@@ -87,7 +78,6 @@
     .green { color: var(--green); } .blue { color: var(--blue); }
     .amber { color: var(--amber); } .red { color: #f87171; } .muted { color: var(--muted); }
 
-    /* DONATION TIERS */
     .tiers { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px,1fr)); gap: 14px; margin-bottom: 24px; }
     .tier-card { border: 2px solid var(--border); border-radius: var(--radius); padding: 18px;
       cursor: pointer; transition: all .15s; text-align: center; }
@@ -101,7 +91,6 @@
     .tier-patron .amount { color: var(--amber); }
     .tier-champion .amount { color: var(--purple); }
 
-    /* RECOGNITION WALL */
     .wall-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px,1fr)); gap: 16px; }
     .wall-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
       padding: 20px; position: relative; }
@@ -120,7 +109,6 @@
     .featured-star { position: absolute; top: 14px; right: 14px; font-size: 1rem; }
     .empty-wall { text-align: center; color: var(--dim); padding: 48px; font-size: 0.9rem; }
 
-    /* TOAST */
     #toast { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(80px);
       background: #1e293b; border: 1px solid var(--border); border-radius: 10px;
       padding: 14px 22px; font-size: 0.9rem; color: var(--text); z-index: 999;
@@ -164,7 +152,6 @@
 
     <form id="submit-form">
       <div class="form-grid">
-        <!-- Type & Target -->
         <div class="field">
           <label>Submission Type *</label>
           <select id="s-type" required>
@@ -355,19 +342,22 @@
       </div>
 
       <hr class="divider" />
-      <div style="background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.25);border-radius:8px;padding:14px 16px;margin-bottom:20px;font-size:0.85rem;color:var(--muted);line-height:1.6;">
-        🔒 <strong style="color:var(--text)">Secure payment via Stripe.</strong> After submitting this form you’ll be directed to a secure Stripe checkout. We never store card details. Donations are non-refundable but every cent goes directly to the project.
+      <div style="background:rgba(0,112,186,0.08);border:1px solid rgba(0,112,186,0.3);border-radius:8px;padding:14px 16px;margin-bottom:20px;font-size:0.85rem;color:var(--muted);line-height:1.6;">
+        🔒 <strong style="color:var(--text)">Secure payment via PayPal.</strong> After submitting this form you'll be redirected to PayPal to complete your donation. We never store payment details. Donations are non-refundable and go directly to supporting the project.
       </div>
       <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
-        <button type="submit" class="btn btn-green" id="donate-btn">💳 Proceed to Checkout</button>
-        <span style="font-size:0.8rem;color:var(--dim);">You’ll be redirected to Stripe.</span>
+        <button type="submit" class="btn btn-paypal" id="donate-btn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg"><path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944.901C5.026.382 5.474 0 5.998 0h7.46c2.57 0 4.578.543 5.69 1.81 1.01 1.15 1.304 2.42 1.012 4.287-.023.143-.047.288-.077.437-.983 5.05-4.349 6.797-8.647 6.797h-2.19c-.524 0-.968.382-1.05.9l-1.12 7.106zm14.146-14.42a3.35 3.35 0 0 0-.607-.541c-.013.076-.026.175-.041.254-.59 3.025-2.566 6.082-8.558 6.082H9.828l-1.43 9.086h3.44l.647-4.098c.082-.518.526-.9 1.05-.9h.463c3.968 0 7.076-1.613 7.985-6.276.386-1.981.085-3.531-.761-4.607z"/></svg>
+          Donate via PayPal
+        </button>
+        <span style="font-size:0.8rem;color:var(--dim);">You'll be redirected to PayPal to complete your donation.</span>
       </div>
     </form>
   </div>
 
   <div class="card" style="border-color:rgba(34,197,94,0.25);">
     <h2>🗣️ Word of Mouth Matters Just as Much</h2>
-    <p class="sub">Not in a position to donate? Sharing this project with someone who would find it useful is genuinely valuable. Every person who discovers this library and contributes data helps make it more complete for everyone. There’s no hierarchy here — a great data correction is as celebrated as a financial contribution.</p>
+    <p class="sub">Not in a position to donate? Sharing this project with someone who would find it useful is genuinely valuable. Every person who discovers this library and contributes data helps make it more complete for everyone. There's no hierarchy here — a great data correction is as celebrated as a financial contribution.</p>
     <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px;">
       <button class="btn btn-ghost" onclick="share('twitter')">Share on X / Twitter</button>
       <button class="btn btn-ghost" onclick="share('linkedin')">Share on LinkedIn</button>
@@ -380,7 +370,7 @@
 <div class="panel" id="panel-wall">
   <div class="card" style="border-color:rgba(245,158,11,0.25);margin-bottom:12px;">
     <h2>⭐ Recognition Wall</h2>
-    <p class="sub">These people and organizations have supported the Master Reference Library financially. We’re deeply grateful. Recognition is entirely optional — anonymous and private donors are equally appreciated.</p>
+    <p class="sub">These people and organizations have supported the Master Reference Library financially. We're deeply grateful. Recognition is entirely optional — anonymous and private donors are equally appreciated.</p>
   </div>
   <div class="wall-grid" id="wall-grid">
     <div class="empty-wall">Loading supporters...</div>
@@ -398,13 +388,13 @@
 <script>
 const SUPABASE_URL = 'https://nmemmfblpzrkwyljpmvp.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5tZW1tZmJscHpya3d5bGpwbXZwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxNDUzNzUsImV4cCI6MjA5MjcyMTM3NX0.iAEq-vnY481qdX0nmsonoDZWNFyFrao02GB_MS5BPzs';
+const PAYPAL_LINK = 'https://www.paypal.com/ncp/payment/SQ9X3PE9QF5WC';
 const { createClient } = supabase;
 const db = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let selectedTier = null;
 let selectedAmount = null;
 
-// ---- TAB SWITCHING ----
 function switchTab(id) {
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
@@ -414,7 +404,6 @@ function switchTab(id) {
   if (id === 'wall') loadWall();
 }
 
-// ---- TOAST ----
 function toast(msg, type = '') {
   const el = document.getElementById('toast');
   el.textContent = msg;
@@ -422,7 +411,6 @@ function toast(msg, type = '') {
   setTimeout(() => { el.className = ''; }, 3500);
 }
 
-// ---- LOAD COUNTRIES FOR SELECT ----
 async function loadCountries() {
   const { data } = await db.from('countries').select('id, name').order('name');
   const sel = document.getElementById('s-country');
@@ -434,12 +422,10 @@ async function loadCountries() {
 }
 loadCountries();
 
-// ---- SUBMISSION FORM ----
 document.getElementById('submit-form').addEventListener('submit', async (e) => {
   e.preventDefault();
   const btn = document.getElementById('submit-btn');
   btn.disabled = true; btn.textContent = 'Submitting...';
-
   try {
     let contributorId = null;
     const name = document.getElementById('s-name').value.trim();
@@ -448,19 +434,14 @@ document.getElementById('submit-form').addEventListener('submit', async (e) => {
     const occupation = document.getElementById('s-occupation').value.trim();
     const ageRange = document.getElementById('s-age').value || null;
     const referral = document.getElementById('s-referral').value.trim();
-
     if (name || email) {
       const { data: contrib, error: ce } = await db.from('contributors').insert({
-        display_name: name || null,
-        email: email || null,
-        country_id: countryId,
-        occupation: occupation || null,
-        age_range: ageRange,
-        referral_source: referral || null,
+        display_name: name || null, email: email || null,
+        country_id: countryId, occupation: occupation || null,
+        age_range: ageRange, referral_source: referral || null,
       }).select('id').single();
       if (!ce) contributorId = contrib.id;
     }
-
     const { error } = await db.from('submissions').insert({
       contributor_id: contributorId,
       type: document.getElementById('s-type').value,
@@ -471,7 +452,6 @@ document.getElementById('submit-form').addEventListener('submit', async (e) => {
       submitter_name: name || null,
       submitter_email: email || null,
     });
-
     if (error) throw error;
     toast('✅ Submission received — thank you!', 'success');
     document.getElementById('submit-form').reset();
@@ -483,7 +463,6 @@ document.getElementById('submit-form').addEventListener('submit', async (e) => {
   }
 });
 
-// ---- STATS ----
 function bar(label, count, total, colorClass) {
   const pct = total > 0 ? Math.round((count / total) * 100) : 0;
   return `
@@ -509,27 +488,23 @@ async function loadStats() {
   document.getElementById('st-pending').textContent = (pending || 0).toLocaleString();
   document.getElementById('st-rejected').textContent = (rejected || 0).toLocaleString();
   document.getElementById('st-contributors').textContent = (contribs || 0).toLocaleString();
-  const rate = total > 0 ? Math.round((accepted / total) * 100) : 0;
-  document.getElementById('st-rate').textContent = rate + '%';
+  document.getElementById('st-rate').textContent = total > 0 ? Math.round((accepted / total) * 100) + '%' : '—';
 
-  // Type breakdown
   const { data: byType } = await db.from('submissions').select('type');
   const types = {};
   byType?.forEach(r => types[r.type] = (types[r.type] || 0) + 1);
   const typeLabels = { new_entry:'New Entry', correction:'Correction', enrichment:'Enrichment', new_domain:'New Domain', source_citation:'Source Citation' };
-  document.getElementById('breakdown-type').innerHTML = total === 0
+  document.getElementById('breakdown-type').innerHTML = !total
     ? '<p style="color:var(--dim);font-size:0.85rem;">No submissions yet — be the first!</p>'
     : Object.entries(types).sort((a,b)=>b[1]-a[1]).map(([k,v]) => bar(typeLabels[k]||k, v, total||1, 'blue')).join('');
 
-  // Table breakdown
   const { data: byTable } = await db.from('submissions').select('target_table');
   const tables = {};
   byTable?.forEach(r => tables[r.target_table] = (tables[r.target_table] || 0) + 1);
-  document.getElementById('breakdown-table').innerHTML = total === 0
+  document.getElementById('breakdown-table').innerHTML = !total
     ? '<p style="color:var(--dim);font-size:0.85rem;">No submissions yet.</p>'
     : Object.entries(tables).sort((a,b)=>b[1]-a[1]).map(([k,v]) => bar(k, v, total||1, 'green')).join('');
 
-  // Demo breakdown
   const { data: byCountry } = await db.from('contributors').select('countries(name)').not('country_id', 'is', null);
   const countries = {};
   byCountry?.forEach(r => { const n = r.countries?.name; if (n) countries[n] = (countries[n]||0)+1; });
@@ -540,7 +515,6 @@ async function loadStats() {
     : sorted.map(([k,v]) => bar(k, v, dTotal||1, 'amber')).join('');
 }
 
-// ---- DONATION ----
 function selectTier(el) {
   document.querySelectorAll('.tier-card').forEach(c => c.classList.remove('selected'));
   el.classList.add('selected');
@@ -554,22 +528,19 @@ document.getElementById('donate-form').addEventListener('submit', async (e) => {
   const btn = document.getElementById('donate-btn');
   const amount = parseFloat(document.getElementById('d-amount').value) || selectedAmount;
   if (!amount || amount < 1) { toast('Please select or enter an amount.', 'error'); return; }
-
-  btn.disabled = true; btn.textContent = 'Processing...';
+  btn.disabled = true; btn.textContent = 'Saving...';
   try {
-    const name = document.getElementById('d-name').value.trim();
-    const email = document.getElementById('d-email').value.trim();
+    const name       = document.getElementById('d-name').value.trim();
+    const email      = document.getElementById('d-email').value.trim();
     const visibility = document.getElementById('d-visibility').value;
-    const note = document.getElementById('d-note').value.trim();
-    const website = document.getElementById('d-website').value.trim();
-    const social = document.getElementById('d-social').value.trim();
-
-    const tier = amount >= 100 ? 'champion' : amount >= 50 ? 'patron' : amount >= 10 ? 'contributor' : 'supporter';
+    const note       = document.getElementById('d-note').value.trim();
+    const website    = document.getElementById('d-website').value.trim();
+    const social     = document.getElementById('d-social').value.trim();
+    const tier       = amount >= 100 ? 'champion' : amount >= 50 ? 'patron' : amount >= 10 ? 'contributor' : 'supporter';
 
     const { data: contrib } = await db.from('contributors').insert({
       display_name: name, email, is_donor: true,
-      support_tier: tier,
-      recognition_visibility: visibility,
+      support_tier: tier, recognition_visibility: visibility,
       recognition_note: note || null,
       website_url: website || null,
       social_handle: social || null,
@@ -583,20 +554,17 @@ document.getElementById('donate-form').addEventListener('submit', async (e) => {
       recognition_visibility: visibility,
     });
 
-    // TODO: replace with real Stripe link once connected
-    toast('❤️ Thank you! Redirecting to checkout...', 'success');
-    setTimeout(() => {
-      window.open(`https://buy.stripe.com/placeholder?prefilled_email=${encodeURIComponent(email)}&amount=${Math.round(amount*100)}`, '_blank');
-    }, 1200);
+    toast('❤️ Thank you! Opening PayPal...', 'success');
+    setTimeout(() => { window.open(PAYPAL_LINK, '_blank'); }, 1000);
   } catch (err) {
     toast('❌ Something went wrong. Please try again.', 'error');
     console.error(err);
   } finally {
-    btn.disabled = false; btn.textContent = '💳 Proceed to Checkout';
+    btn.disabled = false;
+    btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944.901C5.026.382 5.474 0 5.998 0h7.46c2.57 0 4.578.543 5.69 1.81 1.01 1.15 1.304 2.42 1.012 4.287-.023.143-.047.288-.077.437-.983 5.05-4.349 6.797-8.647 6.797h-2.19c-.524 0-.968.382-1.05.9l-1.12 7.106zm14.146-14.42a3.35 3.35 0 0 0-.607-.541c-.013.076-.026.175-.041.254-.59 3.025-2.566 6.082-8.558 6.082H9.828l-1.43 9.086h3.44l.647-4.098c.082-.518.526-.9 1.05-.9h.463c3.968 0 7.076-1.613 7.985-6.276.386-1.981.085-3.531-.761-4.607z"/></svg> Donate via PayPal';
   }
 });
 
-// ---- RECOGNITION WALL ----
 const TIER_BADGES = {
   supporter:   ['badge-supporter',   'Supporter'],
   contributor: ['badge-contributor', 'Contributor'],
@@ -607,7 +575,6 @@ const TIER_BADGES = {
 async function loadWall() {
   const { data: wall } = await db.from('recognition_wall')
     .select('*').eq('is_visible', true).order('featured', { ascending: false }).order('sort_order');
-
   const grid = document.getElementById('wall-grid');
   if (!wall || wall.length === 0) {
     grid.innerHTML = `<div class="empty-wall">
@@ -616,7 +583,6 @@ async function loadWall() {
       <div style="margin-top:8px;font-size:0.8rem;">Every contribution, big or small, helps keep this library growing.</div>
     </div>`;
   } else {
-    const [cls, label] = TIER_BADGES;
     grid.innerHTML = wall.map(w => {
       const [badgeCls, badgeLabel] = TIER_BADGES[w.tier] || TIER_BADGES.supporter;
       return `
@@ -631,7 +597,6 @@ async function loadWall() {
     }).join('');
   }
 
-  // Data contributors
   const { data: dc } = await db.from('contributors')
     .select('display_name, accepted_count').gt('accepted_count', 0).order('accepted_count', { ascending: false });
   document.getElementById('data-contributors').innerHTML = !dc || dc.length === 0
@@ -641,11 +606,10 @@ async function loadWall() {
         <span style="color:var(--dim);">${c.accepted_count} accepted</span></span>`).join('');
 }
 
-// ---- SHARE ----
 function share(platform) {
-  const url = encodeURIComponent(window.location.href);
+  const url  = encodeURIComponent(window.location.href);
   const text = encodeURIComponent('Check out the Master Reference Library — a community-built open knowledge database.');
-  if (platform === 'twitter') window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, '_blank');
+  if (platform === 'twitter')  window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, '_blank');
   if (platform === 'linkedin') window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${url}`, '_blank');
 }
 function copyLink() {
